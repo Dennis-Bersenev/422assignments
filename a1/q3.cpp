@@ -152,7 +152,7 @@ float sensor(int obs, state_t s)
 void output_beliefs()
 {
     FILE* fd;
-    if (fopen_s(&fd, "out/test_3", "w") != 0 || fd == NULL)
+    if (fopen_s(&fd, "out/test_4", "w") != 0 || fd == NULL)
         exit(errno);
 
     if (_dup2(_fileno(fd), _fileno(stdout)) != 0)
@@ -170,25 +170,25 @@ void output_beliefs()
 int main()
 {
     
-    int seq_length = 3;
+    int seq_length = 4;
 
     //1. Specify strat
     //init_belief_uniform();
-    state_t s_initial{3, 2};
-    //state_t s_initial{1, 1};
+    //state_t s_initial{3, 2};
+    state_t s_initial{1, 1};
     init_belief(s_initial);
     
     //2. Specify action seq
     //int actions[] = {0, 0, 0};
     //int actions[] = {0, 0, 0};
-    int actions[] = {3, 3, 0};
-    //int actions[] = {0, 3, 3, 3};
+    //int actions[] = {3, 3, 0};
+    int actions[] = {0, 3, 3, 3};
 
     //3. Specify observation seq
     //int obs[] = {2, 2, 2};
     //int obs[] = {1, 1, 1};
-    int obs[] = {1, 1, 0};
-    //int obs[] = {2, 2, 1, 1};
+    //int obs[] = {1, 1, 0};
+    int obs[] = {2, 2, 1, 1};
 
     //eg. test transition
     for (int i = 0; i < seq_length; i++) {
@@ -206,7 +206,7 @@ int main()
                         tot += (transition(actions[i], get_state(s), get_state(sp)) * belief[s]);
                     }
                 }
-                tot *= sensor(obs[1], get_state(sp));
+                tot *= sensor(obs[i], get_state(sp));
                 //((sp+1)%4 ==0)? printf("transition res: %f\n\n", tot):printf("transition res: %f\n", tot);
                 b_new[sp] = tot;
                 sum += tot;
