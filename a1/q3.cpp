@@ -41,7 +41,7 @@ bool check_states(const state_t& s1, const state_t& s2)
 //Initialise a belief state, given a uniform assumption about initial state, i.e. agent could be anywhere non-terminal
 void init_belief_uniform()
 {
-    int i = 10;
+    int i = 11;
     while (i >= 0) {
         belief[i] = 1.f/9;
         i--;
@@ -54,7 +54,7 @@ void init_belief_uniform()
 void init_belief(state_t s)
 {
     int determined = get_index(s);
-    int i = 10;
+    int i = 11;
     while (i >= 0) {
         belief[i] = 0;
         i--;
@@ -66,7 +66,7 @@ void init_belief(state_t s)
 void check_boundries(state_t * states, const state_t& s0)
 {
     //Check if outside the grid or inside the pillar
-    for (int i = 0; i++; i < 3) {
+    for (int i = 0; i < 3; i++) {
         if ((check_states(states[i], pillar)) || (states[i].row < 1) || (states[i].row > 3) || (states[i].col < 1) || (states[i].col > 4)) {
             states[i].row = s0.row;
             states[i].col = s0.col;
@@ -95,8 +95,8 @@ float transition(int action, state_t s0, state_t s1)
         //DOWN
         case 1:
             reachable[0] = state_t{s0.row - 1, s0.col + 0};
-            reachable[1] = state_t{s0.row + 0, s0.col + 1};
-            reachable[2] = state_t{s0.row + 0, s0.col - 1};
+            reachable[1] = state_t{s0.row + 0, s0.col - 1};
+            reachable[2] = state_t{s0.row + 0, s0.col + 1};
             break;
 
         //LEFT
@@ -109,8 +109,8 @@ float transition(int action, state_t s0, state_t s1)
         //RIGHT
         case 3:
             reachable[0] = state_t{s0.row + 0, s0.col + 1};
-            reachable[1] = state_t{s0.row + 1, s0.col + 0};
-            reachable[2] = state_t{s0.row - 1, s0.col - 0};
+            reachable[1] = state_t{s0.row - 1, s0.col + 0};
+            reachable[2] = state_t{s0.row + 1, s0.col - 0};
             break;
 
         default:
@@ -150,7 +150,6 @@ float sensor(int obs, state_t s)
 
 void output_beliefs()
 {
-    // TODO
     FILE* fd;
     if (fopen_s(&fd, "out/test_1", "w") != 0 || fd == NULL)
         exit(errno);
@@ -158,7 +157,6 @@ void output_beliefs()
     if (_dup2(_fileno(fd), _fileno(stdout)) != 0)
         exit(errno);
 
-    //TODO: FORMATTING!
     printf("----------------------------\n");
     printf("|%.4f|%.4f|%.4f|%.4f|\n", belief[8], belief[9], belief[10], belief[11]);
     printf("|%.4f|xxxxxx|%.4f|%.4f|\n", belief[4], belief[6], belief[7]);
@@ -175,35 +173,75 @@ int main()
 
     //1. Specify strat
     init_belief_uniform();
-
+    
     //2. Specify action seq
     int actions[] = {0, 0, 0};
 
     //3. Specify observation seq
     int obs[] = {2, 2, 2};
 
-    //Main loop to update indiv beliefs (TODO: DEBUG, SET TO 1 ITERATION ATM TO CHECK BY HAND!)
-    for (int i = 0; i < 1; i++) {
-        float sum = 0.f;
-        float b_new[12];
-        float total = 0.f;
-        //Think the bug is its doing it for the pillar here too
-        for (int sp = 0; sp < 11; sp++) {
-            for (int s = 0; s < 11; s++) {
-                sum += transition(actions[i], get_state(s), get_state(sp)) * belief[s];
-            }
-            b_new[sp] = sensor(obs[i], get_state(sp)) * sum;
-            total += b_new[sp];
+    /*
+    Testing helpers
+    int p, t1, t2;
+    p = get_index(pillar);
+    t1 = get_index(term1);
+    t2 = get_index(term2);
+    printf("indices of pillar, term1, and term2: %d, %d, %d\n", p, t1, t2);
+    printf("state of pillar: \n");
+    state_t ps = get_state(p);
+    state t1s = get_state(t1);
+    state t2s = get_state(t2);
+    printf("row: %d, col%d\n", ps.row, ps.col);
+    printf("row: %d, col%d\n", t1s.row, t1s.col);
+    printf("row: %d, col%d\n", t2s.row, t2s.col);
+    bool circ = check_states(ps, pillar);
+    if (circ && check_states(t1s, term1) && check_states(t2s, term2))
+        printf("checks out!\n");
+    
+    //eg. test sensor
+    
+    for (int sp = 0; sp < 12; sp++) {
+        if (sp==5)
+            continue;
+        else {
+            float obs1 = sensor(2, get_state(sp));
+            printf("obersvation res: %f\n", obs1);
         }
-
-        //Normalize and Update beliefs
-        float alpha = 1.f/total;
-        for (int sp = 0; sp < 11; sp++) {
-            belief[sp] = alpha * b_new[sp];
-        }
-        //TODO check results add to 1!!!
     }
-
+    */
+    //eg. test transition
+    for (int i = 0; i < seq_length; i++) {
+        float b_new[12];
+        float sum = 0.f;
+        for (int sp =0; sp < 12; sp++) {
+            if (sp==5) 
+                continue;
+            else {
+                float tot = 0.f;
+                for (int s = 0; s < 12; s++) {
+                    if (s==5)
+                        continue;
+                    else {
+                        tot += (transition(actions[i], get_state(s), get_state(sp)) * belief[s]);
+                    }
+                }
+                tot *= sensor(obs[1], get_state(sp));
+                //((sp+1)%4 ==0)? printf("transition res: %f\n\n", tot):printf("transition res: %f\n", tot);
+                b_new[sp] = tot;
+                sum += tot;
+            }
+        }
+        //printf("alpha denom = %f\n", sum);
+        float alpha = 1.f/sum;
+        for (int sp = 0; sp < 12; sp++) {
+            if (sp==5)
+                continue;
+            else {
+                b_new[sp] *= alpha;
+                belief[sp] = b_new[sp];
+            }
+        }
+    }
     output_beliefs();
     return 0;
 }
