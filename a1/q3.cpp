@@ -52,46 +52,13 @@ void init_belief(state_t s)
 }
 
 //Ensures all (row, col) tuples are within bounds
-void check_boundries(state_t * states, int action)
+void check_boundries(state_t * states, const state_t& s0)
 {
-    //Check if inside grid
+    //Check if outside the grid or inside the pillar
     for (int i = 0; i++; i < 3) {
-        if (states[i].row < 1)
-            states[i].row = 1;
-    
-        if (states[i].row > 3)
-            states[i].row = 3;
-        
-        if (states[i].col < 1)
-            states[i].col = 1;
-        
-        if (states[i].col > 4)
-            states[i].row = 4; 
-    }
-
-    //Check if inside pillar
-    if (check_states(states[i], pillar)) {
-        switch (action) {
-            //UP
-            case 0:
-                states[i].row = 1;
-                states[i].col = 2;
-                break;
-            //DOWN
-            case 1:
-                states[i].row = 3;
-                states[i].col = 2;
-                break;
-            //LEFT
-            case 2:
-                states[i].row = 2;
-                states[i].col = 3;
-                break;
-            //RIGHT
-            case 3:
-                states[i].row = 2;
-                states[i].col = 1;
-                break;
+        if ((check_states(states[i], pillar)) || (states[i].row < 1) || (states[i].row > 3) || (states[i].col < 1) || (states[i].col > 4)) {
+            states[i].row = s0.row;
+            states[i].col = s0.col;
         }
     }
 }
@@ -112,7 +79,6 @@ float transition(int action, state_t s0, state_t s1)
             reachable[0] = state_t{s0.row + 1, s0.col + 0};
             reachable[1] = state_t{s0.row + 0, s0.col + 1};
             reachable[2] = state_t{s0.row + 0, s0.col - 1};
-            check_boundries(&reachable[0], 0);
             break;
 
         //DOWN
@@ -120,7 +86,6 @@ float transition(int action, state_t s0, state_t s1)
             reachable[0] = state_t{s0.row - 1, s0.col + 0};
             reachable[1] = state_t{s0.row + 0, s0.col + 1};
             reachable[2] = state_t{s0.row + 0, s0.col - 1};
-            check_boundries(&reachable[0], 1);
             break;
 
         //LEFT
@@ -128,7 +93,6 @@ float transition(int action, state_t s0, state_t s1)
             reachable[0] = state_t{s0.row + 0, s0.col - 1};
             reachable[1] = state_t{s0.row + 1, s0.col + 0};
             reachable[2] = state_t{s0.row - 1, s0.col - 0};
-            check_boundries(&reachable[0], 2);
             break;
 
         //RIGHT
@@ -136,13 +100,14 @@ float transition(int action, state_t s0, state_t s1)
             reachable[0] = state_t{s0.row + 0, s0.col + 1};
             reachable[1] = state_t{s0.row + 1, s0.col + 0};
             reachable[2] = state_t{s0.row - 1, s0.col - 0};
-            check_boundries(&reachable[0], 3);
             break;
 
         default:
             break;
     }
 
+    check_boundries(&reachable[0], s0);
+            
     if (check_states(reachable[0], s1))
         res+=0.8;
     
