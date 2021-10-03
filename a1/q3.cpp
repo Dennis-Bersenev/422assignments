@@ -2,6 +2,7 @@
 #include <math.h>
 #include <iostream>
 #include <io.h>
+#include <vector>
 
 //Holds beliefs of being in each state; ignores entry 5 FOR PILLAR
 float belief[12];
@@ -151,7 +152,7 @@ float sensor(int obs, state_t s)
 void output_beliefs()
 {
     FILE* fd;
-    if (fopen_s(&fd, "out/test_1", "w") != 0 || fd == NULL)
+    if (fopen_s(&fd, "out/test_4", "w") != 0 || fd == NULL)
         exit(errno);
 
     if (_dup2(_fileno(fd), _fileno(stdout)) != 0)
@@ -168,47 +169,28 @@ void output_beliefs()
 
 int main()
 {
-
-    int seq_length = 3;
+    
+    int seq_length = 4;
 
     //1. Specify strat
-    init_belief_uniform();
+    //init_belief_uniform();
+    //state_t s_initial{3, 2};
+    //init_belief(s_initial)
+    state_t s_initial{1, 1};
+    init_belief(s_initial)
     
     //2. Specify action seq
-    int actions[] = {0, 0, 0};
+    //int actions[] = {0, 0, 0};
+    //int actions[] = {0, 0, 0};
+    //int actions[] = {3, 3, 0};
+    int actions[] = {0, 3, 3, 3};
 
     //3. Specify observation seq
-    int obs[] = {2, 2, 2};
+    //int obs[] = {2, 2, 2};
+    //int obs[] = {1, 1, 1};
+    //int obs[] = {1, 1, 0};
+    int obs[] = {2, 2, 1, 1};
 
-    /*
-    Testing helpers
-    int p, t1, t2;
-    p = get_index(pillar);
-    t1 = get_index(term1);
-    t2 = get_index(term2);
-    printf("indices of pillar, term1, and term2: %d, %d, %d\n", p, t1, t2);
-    printf("state of pillar: \n");
-    state_t ps = get_state(p);
-    state t1s = get_state(t1);
-    state t2s = get_state(t2);
-    printf("row: %d, col%d\n", ps.row, ps.col);
-    printf("row: %d, col%d\n", t1s.row, t1s.col);
-    printf("row: %d, col%d\n", t2s.row, t2s.col);
-    bool circ = check_states(ps, pillar);
-    if (circ && check_states(t1s, term1) && check_states(t2s, term2))
-        printf("checks out!\n");
-    
-    //eg. test sensor
-    
-    for (int sp = 0; sp < 12; sp++) {
-        if (sp==5)
-            continue;
-        else {
-            float obs1 = sensor(2, get_state(sp));
-            printf("obersvation res: %f\n", obs1);
-        }
-    }
-    */
     //eg. test transition
     for (int i = 0; i < seq_length; i++) {
         float b_new[12];
