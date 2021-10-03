@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
+#include <io.h>
 
 //Holds beliefs of being in each state; ignores entry 5 FOR PILLAR
 float belief[12];
@@ -148,7 +150,23 @@ float sensor(int obs, state_t s)
 
 void output_beliefs()
 {
-    //TODO
+    // TODO
+    FILE* fd;
+    if (fopen_s(&fd, "out/test_1", "w") != 0 || fd == NULL)
+        exit(errno);
+
+    if (_dup2(_fileno(fd), _fileno(stdout)) != 0)
+        exit(errno);
+
+    std::cout << "----------------------------------------------------------------------------------------\n";
+    std::cout << "----------------------------------------------------------------------------------------\n";
+
+    std::cout << "----------------------------------------------------------------------------------------\n";
+    std::cout << "----------------------------------------------------------------------------------------\n";
+
+    std::cout << "----------------------------------------------------------------------------------------\n";
+    std::cout << "----------------------------------------------------------------------------------------\n";
+    fclose(fd);
     return;
 }
 
@@ -187,6 +205,6 @@ int main()
         //TODO check results add to 1!!!
     }
 
-    printf("just a review\n");
+    output_beliefs();
     return 0;
 }
