@@ -182,11 +182,12 @@ int main()
     //3. Specify observation seq
     int obs[] = {2, 2, 2};
 
-    //Main loop to update indiv beliefs
-    for (int i = 0; i < 3; i++) {
+    //Main loop to update indiv beliefs (TODO: DEBUG, SET TO 1 ITERATION ATM TO CHECK BY HAND!)
+    for (int i = 0; i < 1; i++) {
         float sum = 0.f;
         float b_new[12];
         float total = 0.f;
+        //Think the bug is its doing it for the pillar here too
         for (int sp = 0; sp < 11; sp++) {
             for (int s = 0; s < 11; s++) {
                 sum += transition(actions[i], get_state(s), get_state(sp)) * belief[s];
