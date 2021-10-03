@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <math.h>
 
-
-float belief[11];
+//Holds beliefs of being in each state; ignores entry 5 FOR PILLAR
+float belief[12];
 
 struct state{
     int row;
@@ -18,6 +19,14 @@ const state_t pillar{2, 2};
 int get_index(state_t s)
 {
     return (4*(s.row-1)+(s.col-1));
+}
+
+//Helper to get the state corresponding to an index from the belief array
+state_t get_state(int index)
+{
+    int row = floor(index/4) + 1;
+    int col = index - ((row - 1) * 4) + 1;
+    return state_t{row, col};
 }
 
 
@@ -137,9 +146,47 @@ float sensor(int obs, state_t s)
     return res;
 }
 
+void output_beliefs()
+{
+    //TODO
+    return;
+}
+
 int main()
 {
+
+    int seq_length = 3;
+
+    //1. Specify strat
     init_belief_uniform();
+
+    //2. Specify action seq
+    int actions[] = {0, 0, 0};
+
+    //3. Specify observation seq
+    int obs[] = {2, 2, 2};
+
+    //Main loop to update indiv beliefs
+    for (int i = 0; i < seq_length; i++) {
+        float sum = 0.f;
+        float b_new[12];
+        float total = 0.f;
+        for (int sp = 0; sp < 11; sp++) {
+            for (int s = 0; s < 11; s++) {
+                sum += transition(actions[i], get_state(s), get_state(sp)) * belief[s];
+            }
+            b_new[sp] = sensor(obs[i], get_state(sp)) * sum;
+            total += b_new[sp];
+        }
+
+        //Normalize and Update beliefs
+        float alpha = 1.f/total;
+        for (int sp = 0; sp < 11; sp++) {
+            belief[sp] = alpha * b_new[sp];
+        }
+        //TODO check results add to 1!!!
+    }
+
     printf("just a review\n");
     return 0;
 }
